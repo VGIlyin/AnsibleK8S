@@ -1,0 +1,29 @@
+---
+- name: Update repos and install base
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - vim
+      - telnet
+      - tcpdump
+      - atop
+    state: latest
+    update_cache: true
+
+- name: Disable swap
+  shell: |
+    swapoff -a
+
+- name: Add Docker key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker repo
+  when: ansible_facts['distribution'] == "Ubuntu"
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu focal stable
+

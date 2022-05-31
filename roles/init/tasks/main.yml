@@ -1,0 +1,6 @@
+---
+
+- name: Installing basic packages and join to cluster
+  include_tasks: init.yml
+  tags:
+    - init
