@@ -1,5 +1,12 @@
 ---
+- name: Set device hostname
+  become: true
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+    use: systemd
+
 - name: Update repos and install base
+  become: true
   apt:
     name:
       - apt-transport-https
@@ -18,12 +25,47 @@
     swapoff -a
 
 - name: Add Docker key
+  become: true
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
 
+- name: Add K8S key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
 - name: Add Docker repo
+  become: true
   when: ansible_facts['distribution'] == "Ubuntu"
   apt_repository:
     repo: deb https://download.docker.com/linux/ubuntu focal stable
+
+- name: Install Docker
+  become: true
+  apt:
+    name: docker-ce
+    state: present
+
+- name: Add K8S repos
+  become: true
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+ 
+- name: Install K8S managment apps
+  become: true
+  apt:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    state: latest
+    update_cache: true
+
+- name: delete toml for containerd
+  become: true
+  shell: |
+    rm -f /etc/containerd/config.toml
+  notify: ContainerD
 

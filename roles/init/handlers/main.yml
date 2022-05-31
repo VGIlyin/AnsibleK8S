@@ -1,0 +1,6 @@
+- name: ContainerD
+  become: true
+  systemd:
+    name: containerd
+    state: restarted
+
